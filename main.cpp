@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include <iostream>
 
+//Compilation (Linux): c++ main.cpp -o overlay -lSDL2main -lSDL2
 int main(int argc, char* argv[])
 {
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
