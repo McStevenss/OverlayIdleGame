@@ -1,6 +1,15 @@
 #include <SDL2/SDL.h>
 #include <iostream>
 
+
+struct cube {
+    float x = 0;
+    float y;
+    int r = 100;
+    int g = 100;
+    int b = 100;
+    float velocity = 2;
+};
 //Compilation (Linux): c++ main.cpp -o overlay -lSDL2main -lSDL2
 int main(int argc, char* argv[])
 {
@@ -10,9 +19,13 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    const int width = 300;
-    // const int height = 200;
-    const int height = 300;
+    // const int width = 300;
+    // const int height = 300;
+
+    int width = 300;
+    int height = 300;
+
+
     bool dragging = false;
     int dragOffsetX = 0;
     int dragOffsetY = 0;
@@ -50,22 +63,53 @@ int main(int argc, char* argv[])
     bool running = true;
     SDL_Event event;
 
-    int x = 0;
-    int velocity = 2;
+    // int x = 0;
+    // int velocity = 2;
     int square_size = 8;
 
+
+    std::cout << "################### INFO ####################" << std::endl;
+    std::cout << "#                                           #" << std::endl;
+    std::cout << "# -Left Control + Drag mouse to move window #" << std::endl;
+    std::cout << "#                                           #" << std::endl;
+    std::cout << "#                                           #" << std::endl;
+    std::cout << "#                                           #" << std::endl;
+    std::cout << "#############################################" << std::endl;
+
+
+    cube cube1; 
+    cube1.g = 255;
+    cube1.velocity = 1.0f;
+
+    cube cube2; 
+    cube2.r = 255;
+    cube2.velocity = 1.25f;
+    
+    cube cube3;
+    cube3.b = 255;
+    cube3.velocity = 1.5f;
+    
+    cube cubes[3] = {cube1,cube2,cube3};
     while (running)
     {
-        // while (SDL_PollEvent(&event))
-        // {
-        //     if (event.type == SDL_QUIT)
-        //         running = false;
-        // }
         const Uint8 *state = SDL_GetKeyboardState(NULL);
 
         if (state[SDL_SCANCODE_ESCAPE]){
             running = false;
         }
+        else if (state[SDL_SCANCODE_O]){
+            width = width + 60;
+            height = height + 60;
+            SDL_SetWindowSize(window, width, height);
+        }
+        
+        else if (state[SDL_SCANCODE_P]){
+            width = width - 60;
+            height = height - 60;
+
+            SDL_SetWindowSize(window, width, height);
+        }
+
         while (SDL_PollEvent(&event))
         {
             if (event.type == SDL_QUIT)
@@ -89,6 +133,8 @@ int main(int argc, char* argv[])
             {
                 dragging = false;
             }
+
+
             else if (event.type == SDL_MOUSEMOTION && dragging)
             {
                 int mouseX, mouseY;
@@ -102,26 +148,26 @@ int main(int argc, char* argv[])
         }
 
         // Update
-        x += velocity;
-        if (x < 0 || x > width - square_size)
-            velocity = -velocity;
+        for(int i = 0; i < 3; i++)
+        {
+            cubes[i].x += cubes[i].velocity;
+            cubes[i].y = height / 2 - (i*square_size);
+
+            if (cubes[i].x < 0 || cubes[i].x > width - square_size)
+                cubes[i].velocity = cubes[i].velocity * -1;
+        }
 
         // Render
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
-
-        SDL_Rect rect{ x, height / 2, square_size, square_size};
-        SDL_SetRenderDrawColor(renderer, 255, 100, 250, 255);
-        SDL_RenderFillRect(renderer, &rect);
-    
-        SDL_Rect rect2{ x, height / 2 - square_size, square_size, square_size};
-        SDL_SetRenderDrawColor(renderer, 255, 100, 100, 255);
-        SDL_RenderFillRect(renderer, &rect2);
-
         
-        SDL_Rect rect3{ x, height / 2 - (2*square_size), square_size, square_size};
-        SDL_SetRenderDrawColor(renderer, 100, 250, 100, 255);
-        SDL_RenderFillRect(renderer, &rect3);
+
+        for(int i = 0; i < 3; i++)
+        {
+            SDL_Rect rect{cubes[i].x,cubes[i].y, square_size, square_size};
+            SDL_SetRenderDrawColor(renderer, cubes[i].r, cubes[i].g, cubes[i].b, 255);
+            SDL_RenderFillRect(renderer, &rect);
+        }
 
         SDL_RenderPresent(renderer);
 
