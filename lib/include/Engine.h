@@ -15,5 +15,6 @@ class Engine{
         int dragOffsetY = 0;
         SDL_Window* window;
         SDL_Renderer* renderer;
+        SDL_GLContext OpenGLContext;
         bool running = true;
 };

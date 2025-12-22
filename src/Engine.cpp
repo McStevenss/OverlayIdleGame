@@ -19,13 +19,22 @@ Engine::Engine()
         std::cerr << "SDL_Init failed: " << SDL_GetError() << "\n";
     }
 
+    // SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+    // SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+
+    // SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    // SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+    // SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    // SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+
+
     window = SDL_CreateWindow(
         "Overlay",
         SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED,
         width,
         height,
-        SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALWAYS_ON_TOP
+        SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALWAYS_ON_TOP | SDL_WINDOW_OPENGL
     );
 
     if (!window)
@@ -40,6 +49,12 @@ Engine::Engine()
         SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
     );
 
+    // OpenGLContext = SDL_GL_CreateContext(window);
+    // if(OpenGLContext == nullptr){
+    //     std::cout << "[!][Engine] Could not create OpenGL context" << std::endl;
+    //     exit(1);
+    // }
+    // SDL_GL_MakeCurrent(window, OpenGLContext);
 
     if (!renderer)
     {
