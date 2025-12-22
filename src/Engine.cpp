@@ -1,14 +1,33 @@
 #include "Engine.h"
 
 
+// struct cube {
+//     float x = 0;
+//     float y;
+//     int r = 100;
+//     int g = 100;
+//     int b = 100;
+//     float velocity = 2;
+// };
+
 struct cube {
-    float x = 0;
-    float y;
+    float x = 0.0f;
+    float y = 0.0f;
+
+    float vx = 0.0f;
+    float vy = 0.0f;
+
     int r = 100;
     int g = 100;
     int b = 100;
-    float velocity = 2;
 };
+
+inline float clamp(float v, float min, float max)
+{
+    if (v < min) return min;
+    if (v > max) return max;
+    return v;
+}
 
 Engine::Engine()
 {
@@ -70,17 +89,31 @@ void Engine::Start()
     
     cube cube1; 
     cube1.g = 255;
-    cube1.velocity = 1.0f;
+    // cube1.velocity = 1.0f;
 
     cube cube2; 
     cube2.r = 255;
-    cube2.velocity = 1.25f;
+    // cube2.velocity = 1.25f;
     
     cube cube3;
     cube3.b = 255;
-    cube3.velocity = 1.5f;
+    // cube3.velocity = 1.5f;
 
     cube cubes[3] = {cube1,cube2,cube3};
+
+    std::srand(static_cast<unsigned>(std::time(nullptr)));
+
+    for (int i = 0; i < 3; i++)
+    {
+        cubes[i].x = rand() % (width - square_size);
+        cubes[i].y = rand() % (height - square_size);
+
+        float speed = 1.0f + (rand() % 100) / 50.0f; // ~1.0–3.0
+        float angle = (rand() % 360) * 3.1415926f / 180.0f;
+
+        cubes[i].vx = std::cos(angle) * speed;
+        cubes[i].vy = std::sin(angle) * speed;
+    }
 
     SDL_Event event;
 
@@ -89,14 +122,24 @@ void Engine::Start()
         
         HandleInput(event);
 
-        // Update
-        for(int i = 0; i < 3; i++)
+        for (int i = 0; i < 3; i++)
         {
-            cubes[i].x += cubes[i].velocity;
-            cubes[i].y = height / 2 - (i*square_size);
+            cube& c = cubes[i];
 
-            if (cubes[i].x < 0 || cubes[i].x > width - square_size)
-                cubes[i].velocity = cubes[i].velocity * -1;
+            c.x += c.vx;
+            c.y += c.vy;
+
+            if (c.x <= 0 || c.x >= width - square_size)
+            {
+                c.vx *= -1;
+                c.x = clamp(c.x, 0.0f, (float)(width - square_size));
+            }
+
+            if (c.y <= 0 || c.y >= height - square_size)
+            {
+                c.vy *= -1;
+                c.y = clamp(c.y, 0.0f, (float)(height - square_size));
+            }
         }
 
         // Render
