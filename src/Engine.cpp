@@ -1,27 +1,6 @@
 #include "Engine.h"
 
 
-// struct cube {
-//     float x = 0;
-//     float y;
-//     int r = 100;
-//     int g = 100;
-//     int b = 100;
-//     float velocity = 2;
-// };
-
-struct cube {
-    float x = 0.0f;
-    float y = 0.0f;
-
-    float vx = 0.0f;
-    float vy = 0.0f;
-
-    int r = 100;
-    int g = 100;
-    int b = 100;
-};
-
 inline float clamp(float v, float min, float max)
 {
     if (v < min) return min;
@@ -85,44 +64,59 @@ Engine::Engine()
 
 void Engine::Start()
 {
-    int square_size = 8;
-    
-    cube cube1; 
-    cube1.g = 255;
-    // cube1.velocity = 1.0f;
-
-    cube cube2; 
-    cube2.r = 255;
-    // cube2.velocity = 1.25f;
-    
-    cube cube3;
-    cube3.b = 255;
-    // cube3.velocity = 1.5f;
-
-    cube cubes[3] = {cube1,cube2,cube3};
-
     std::srand(static_cast<unsigned>(std::time(nullptr)));
 
-    for (int i = 0; i < 3; i++)
+    int square_size = 8;
+    int num_cubes = rand() % 10;
+    if (num_cubes == 0)
     {
-        cubes[i].x = rand() % (width - square_size);
-        cubes[i].y = rand() % (height - square_size);
+        num_cubes = 5;
+    }
+
+    std::cout << "Creating " << num_cubes << " cubes" << std::endl; 
+    
+    cube cubes[num_cubes];
+
+    for (int i = 0; i < num_cubes; i++)
+    {
+        cube new_cube;
+        // cubes[i] = temp_cube;
+
+        new_cube.x = rand() % (width - square_size);
+        new_cube.y = rand() % (height - square_size);
+
+        new_cube.r = (rand() % 255);
+        new_cube.g = (rand() % 255);
+        new_cube.b = (rand() % 255);
+
+        if(new_cube.r < 50)
+            new_cube.r = 50;
+        if(new_cube.g < 50)
+            new_cube.g = 50;
+        if(new_cube.b < 50)
+            new_cube.b = 50;
 
         float speed = 1.0f + (rand() % 100) / 50.0f; // ~1.0–3.0
         float angle = (rand() % 360) * 3.1415926f / 180.0f;
 
-        cubes[i].vx = std::cos(angle) * speed;
-        cubes[i].vy = std::sin(angle) * speed;
+        new_cube.vx = std::cos(angle) * speed;
+        new_cube.vy = std::sin(angle) * speed;
+
+        cubes[i] = new_cube;
     }
 
     SDL_Event event;
 
     while (running)
     {
-        
+        // Render
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+
         HandleInput(event);
 
-        for (int i = 0; i < 3; i++)
+        // Update cubes
+        for (int i = 0; i < num_cubes; i++)
         {
             cube& c = cubes[i];
 
@@ -140,20 +134,14 @@ void Engine::Start()
                 c.vy *= -1;
                 c.y = clamp(c.y, 0.0f, (float)(height - square_size));
             }
-        }
 
-        // Render
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderClear(renderer);
-        
-        for(int i = 0; i < 3; i++)
-        {
+            // Render updated cube
             SDL_Rect rect{(int)cubes[i].x,(int)cubes[i].y, square_size, square_size};
             SDL_SetRenderDrawColor(renderer, cubes[i].r, cubes[i].g, cubes[i].b, 255);
             SDL_RenderFillRect(renderer, &rect);
         }
 
-        
+
         SDL_RenderPresent(renderer);
         SDL_Delay(10); // ~60 FPS
     }
@@ -207,7 +195,6 @@ void Engine::HandleInput(SDL_Event event)
         {
             dragging = false;
         }
-
 
         else if (event.type == SDL_MOUSEMOTION && dragging)
         {

@@ -3,6 +3,18 @@
 #include <cstdlib>
 #include <ctime>
 
+struct cube {
+    float x = 0.0f;
+    float y = 0.0f;
+
+    float vx = 0.0f;
+    float vy = 0.0f;
+
+    int r = 100;
+    int g = 100;
+    int b = 100;
+};
+
 class Engine{
     public:
         Engine();
